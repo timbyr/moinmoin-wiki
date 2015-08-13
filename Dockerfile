@@ -15,7 +15,6 @@ ENV MM_CSUM 4a616d12a03f51787ac996392f9279d0398bfb3b
 RUN apt-get update && apt-get install -qqy --no-install-recommends \
   python \
   curl \
-  openssl \
   nginx \
   uwsgi \
   uwsgi-plugin-python \
@@ -51,12 +50,6 @@ RUN ln -s /etc/nginx/sites-available/moinmoin.conf \
   /etc/nginx/sites-enabled/moinmoin.conf
 RUN rm /etc/nginx/sites-enabled/default
 
-# Create self signed certificate
-ADD generate_ssl_key.sh /usr/local/bin/
-RUN /usr/local/bin/generate_ssl_key.sh moinmoin.example.org
-RUN mv cert.pem /etc/ssl/certs/
-RUN mv key.pem /etc/ssl/private/
-
 # Cleanup
 RUN rm $MM_VERSION.tar.gz
 RUN rm -rf /moinmoin
@@ -68,7 +61,6 @@ RUN rm -rf /tmp/* /var/lib/apt/lists/*
 VOLUME /usr/local/share/moin/data
 
 EXPOSE 80
-EXPOSE 443
 
 CMD service rsyslog start && service nginx start && \
   uwsgi --uid www-data \
